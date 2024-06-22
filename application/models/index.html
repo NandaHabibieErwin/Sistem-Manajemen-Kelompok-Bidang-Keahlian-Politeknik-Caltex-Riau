@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>403 Forbidden</title>
+</head>
+<body>
+
+<p>Directory access is forbidden.</p>
+
+</body>
+</html>
+
+public function getAllPengajuanEvent()
+{
+	$query = $this->db->query('SELECT pengajuan_event.id_pengajuanevent, users.name, kbk.nama_kbk, pengajuan_event.judul_event, pengajuan_event.jadwal, pengajuan_event.tempat, kbk.id_kbk, users.id_kbkp, pengajuan_event.jenis, pengajuan_event.proposal, pengajuan_event.status
+	FROM pengajuan_event, users, kbk
+	WHERE users.id_user = pengajuan_event.id_user AND pengajuan_event.id_kbk = kbk.id_kbk 
+	ORDER BY pengajuan_event.jadwal DESC');
+	return $query->result_array();
+}
+
+public function add_ajukan_event()
+{
+    // Retrieve form data
+    $id_user = intval($this->input->post('id_user'));
+    $judul_event = $this->input->post('judul_event');
+    $jadwal = $this->input->post('jadwal');
+    $tempat = $this->input->post('tempat');
+    $jenis = $this->input->post('jenis');
+
+    // File upload configuration
+    $config['upload_path'] = './assets/proposal';
+    $config['allowed_types'] = 'pdf|docx';
+    $config['max_size'] = 10240;
+    $this->load->library('upload', $config);
+
+    // Retrieve the files
+    $files = $_FILES['proposal'];
+
+    $uploadedFiles = array();
+    $errors = array();
+
+    // Process each file
+    foreach ($files['name'] as $key => $name) {
+        $_FILES['userfile']['name'] = $files['name'][$key];
+        $_FILES['userfile']['type'] = $files['type'][$key];
+        $_FILES['userfile']['tmp_name'] = $files['tmp_name'][$key];
+        $_FILES['userfile']['error'] = $files['error'][$key];
+        $_FILES['userfile']['size'] = $files['size'][$key];
+
+        if (!$this->upload->do_upload('userfile')) {
+            $errors[] = $this->upload->display_errors();
+        } else {
+            $data = $this->upload->data();
+            $uploadedFiles[] = $data['file_name'];
+        }
+    }
+
+    // Retrieve the user's id_kbk and id_kbkp
+    $id_kbk = $this->input->post('id_kbk');
+    $id_kbkp = $this->input->post('id_kbkp');
+
+    // Retrieve the current page's kbk
+    $currentKbk = $this->input->post('id_kbkk');
+
+	if($currentKbk == $id_kbk)
+	{
+		$kbkPost = $currentKbk;
+	}
+
+	else if ($currentKbk == $id_kbkp)
+	{
+		$kbkPost = $currentKbk;
+	}
+
+    // Prepare the data for insertion
+    $data = array(
+        'id_user' => $id_user,
+        'judul_event' => $judul_event,
+        'jadwal' => $jadwal,
+        'tempat' => $tempat,
+        'jenis' => $jenis,
+        'id_kbk' => $kbkPost,
+        'proposal' => implode(',', $uploadedFiles)
+    );
+
+    // Insert the event data
+    $this->EventModel->insertAjukanEvent($data);
+}

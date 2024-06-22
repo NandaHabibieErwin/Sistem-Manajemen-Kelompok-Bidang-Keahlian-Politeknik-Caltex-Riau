@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>403 Forbidden</title>
+</head>
+<body>
+
+<p>Directory access is forbidden.</p>
+
+</body>
+</html>
+
+<?php
+		foreach ($kegiatan as $k): ?>
+			<div class="mt-2 animated slideInDown">
+				<div class="row">
+					<div class="col-md-12 col-sm-12 blog-posts">
+						<div class="row" itemscope itemtype="http://schema.org/CreativeWork">
+							<div class="col-md-3 col-sm-3">
+								<img class="img-responsive" alt="Laporan Keuangan 2022"
+									src="https://pcr.ac.id/assets/images/artikel/medium_Laporan_Keuangan_202220230504110830.jpg">
+							</div>
+							<div class="col-md-9 col-sm-9">
+								<h2 itemprop="headline"><a href="<?php echo site_url('kegiatan/event/' . $k['id_event']); ?>">
+										<?php echo $k['judul_event']; ?>
+									</a></h2>
+								<ul class="blog-info">
+									<li><i class="fa fa-calendar"></i> <time itemprop="dateModified"
+											datetime="2023-05-04T12:00:00+00:00"><?php echo $k['jadwal']; ?></time></span>
+									</li>
+									<li>
+										<i class="fa fa-tags"></i>
+										<a href='#'>
+											<?php echo $k['jenis']; ?>
+										</a>
+									</li>
+									<li itemprop="author" itemscope itemtype="http://schema.org/Person">
+										<i class="fa fa-user"></i> KBK <span itemprop="name">
+											<?php echo $k['nama_kbk']; ?>
+										</span>
+									</li>
+								</ul>
+								<div itemprop="text">
+									<p>
+										Berikut Terlampir Hasil Audit Keuangan Politeknik Caltex Riau secara
+										terbuka oleh pihak Eksternal (Akuntan Publik) Tahun 2022
+
+										Unduh Laporan Keuangan YPCR tahun 2022.
+
+										&nbsp;
+									</p>
+								</div>
+								<a href="<?php echo site_url('kegiatan/event/' . $k['id_event']); ?>" class="more">Read
+									more <i class="icon-angle-right"></i></a>
+								<?php $id_event = $k['id_event'];
+								$id_user = $user_info->id_user;
+
+								// Check if the user has already followed the event
+								$isFollowed = $this->EventModel->getUserFollowEvent($id_user, $id_event); ?>
+								<?php if (!$isFollowed) {?>
+								<button class="assign-ketua" data-id-event="<?php echo $k['id_event']; ?>">Ikuti
+									Event</button><?php } else {echo "Anda telah mengikuti";}?>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<?php endforeach; ?>
